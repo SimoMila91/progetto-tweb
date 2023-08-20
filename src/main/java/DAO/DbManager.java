@@ -9,7 +9,7 @@ public class DbManager {
     private static final String PASSWORD = "";
     private static Connection conn = null;
 
-     {
+    static {
         try {
             DriverManager.registerDriver(new com.mysql.jdbc.Driver());
             System.out.println("Driver successfully registered");
@@ -25,8 +25,8 @@ public class DbManager {
             return conn;
         } catch (SQLException e) {
             System.out.println("Connection Error: " + e.getMessage());
+            return null;
         }
-        return null;
     }
 
     public void closeConnection() throws SQLException {

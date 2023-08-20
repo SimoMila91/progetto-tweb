@@ -1,23 +1,28 @@
 package entities;
 
-public class Docente extends Persona {
-
+public class Teacher extends Person {
     private int idTeacher;
     private int rating;
-    private Persona person;
+    private int active;
 
-    public Docente(String nome, String cognome, String email, int idTeacher, int rating, Persona person) {
-        super(nome, cognome, email);
+    public Teacher(int idTeacher, String name, String surname, int rating) {
+        super(name, surname);
         this.idTeacher = idTeacher;
         this.rating = rating;
-        this.person = person;
     }
 
-    public int getIdDocente() {
+    public Teacher(int idTeacher, String name, String surname, int rating, int active) {
+        super(name, surname);
+        this.idTeacher = idTeacher;
+        this.rating = rating;
+        this.active = active;
+    }
+
+    public int getIdTeacher() {
         return idTeacher;
     }
 
-    public void setIdDocente(int idTeacher) {
+    public void setIdTeacher(int idTeacher) {
         this.idTeacher = idTeacher;
     }
 
@@ -29,20 +34,12 @@ public class Docente extends Persona {
         this.rating = rating;
     }
 
-    public Persona getPersona() {
-        return person;
-    }
-
-    public void setPersona(Persona person) {
-        this.person = person;
-    }
 
     @Override
     public String toString() {
         return "Docente{" +
                 "idDocente=" + idTeacher +
                 ", rating=" + rating +
-                ", persona=" + person +
                 '}';
     }
 }

@@ -3,7 +3,7 @@ package entities;
 import java.sql.Date;
 import java.sql.Time;
 
-public class Prenotazione {
+public class Booking {
     private int idBooking;
     private Time time;
     private Date date;
@@ -11,7 +11,7 @@ public class Prenotazione {
     private int idUser;
     private int idLesson;
 
-    public Prenotazione(int idBooking, Time time, Date date, int state, int idUser, int idLesson) {
+    public Booking(int idBooking, Time time, Date date, int state, int idUser, int idLesson) {
         this.idBooking = idBooking;
         this.time = time;
         this.date = date;

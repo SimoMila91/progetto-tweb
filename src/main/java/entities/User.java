@@ -1,17 +1,23 @@
 package entities;
 
-public class Utente extends Persona {
+public class User extends Person {
     private int idUser;
     private String psw;
     private int role;
-    private Persona person;
+    private String email;
 
-    public Utente(String nome, String cognome, String email, int idUser, String psw, int role, Persona person) {
-        super(nome, cognome, email);
+    public User(String name, String surname, String email, int idUser, String psw, int role) {
+        super(name, surname);
         this.idUser = idUser;
         this.psw = psw;
         this.role = role;
-        this.person = person;
+        this.email = email;
+    }
+
+    public User(String name, String surname, String email, String psw) {
+        super(name, surname);
+        this.psw = psw;
+        this.email = email;
     }
 
     public int getIdUser() {
@@ -38,12 +44,12 @@ public class Utente extends Persona {
         this.role = role;
     }
 
-    public Persona getPerson() {
-        return person;
+    public String getEmail() {
+        return email;
     }
 
-    public void setPerson(Persona person) {
-        this.person = person;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Override
@@ -52,7 +58,6 @@ public class Utente extends Persona {
                 "idUser=" + idUser +
                 ", psw='" + psw + '\'' +
                 ", role=" + role +
-                ", person=" + person +
                 '}';
     }
 }
