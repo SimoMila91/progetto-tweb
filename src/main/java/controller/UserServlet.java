@@ -98,7 +98,6 @@ public class UserServlet extends HttpServlet {
                         out.flush();
                     }
 
-                    response.put("message", "Registrazione avvenuta con successo");
                 } else {
                     res.setStatus(400);
                     out.println("Tutti i campi sono obbligatori per la registrazione");

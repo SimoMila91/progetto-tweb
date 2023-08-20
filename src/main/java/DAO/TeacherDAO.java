@@ -2,6 +2,7 @@ package DAO;
 
 import entities.Teacher;
 import org.json.JSONObject;
+import utils.UtilsMethods;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +19,9 @@ public class TeacherDAO {
             DbManager db = new DbManager();
             try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
                 ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
+                int counter = UtilsMethods.countRows(rs);
+                if (counter > 0) {
+                    rs.beforeFirst();
                     while(rs.next()) {
                         Teacher t = new Teacher(
                                 rs.getInt("idTeacher"),
