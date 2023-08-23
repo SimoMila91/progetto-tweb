@@ -45,6 +45,26 @@ public class CourseDAO {
         }
     }
 
+    public static Course getCourse(int idCourse) throws SQLException {
+        String query = "SELECT * FROM course WHERE idCourse = (?)";
+        DbManager db = new DbManager();
+
+        try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
+            ps.setInt(1, idCourse);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new Course(
+                        rs.getInt("idCourse"),
+                        rs.getString("title"),
+                        rs.getInt("active")
+                );
+            } else {
+                return null;
+            }
+        }
+    }
+
     public static int createCourse(JSONObject request) throws SQLException {
 
         String title = request.getString("title");
@@ -82,6 +102,17 @@ public class CourseDAO {
         DbManager db = new DbManager();
         try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
             ps.setInt(1, id);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        }
+    }
+
+    public static boolean updateCourse(String title, int idCourse) throws SQLException {
+        String query = "UPDATE course SET title = (?) WHERE idCourse = (?)";
+        DbManager db = new DbManager();
+        try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
+            ps.setString(1, title);
+            ps.setInt(2, idCourse);
             int rows = ps.executeUpdate();
             return rows > 0;
         }
