@@ -34,6 +34,13 @@ public class Teacher extends Person {
         this.rating = rating;
     }
 
+    public int getActive() {
+        return active;
+    }
+
+    public void setActive(int active) {
+        this.active = active;
+    }
 
     @Override
     public String toString() {

@@ -10,14 +10,30 @@ public class Booking {
     private int state;
     private int idUser;
     private int idLesson;
+    private String studentName;
 
-    public Booking(int idBooking, Time time, Date date, int state, int idUser, int idLesson) {
+
+
+    public Booking(int idBooking, Time time, Date date, int state, int idUser, int idLesson, String studentName) {
         this.idBooking = idBooking;
         this.time = time;
         this.date = date;
         this.state = state;
         this.idUser = idUser;
         this.idLesson = idLesson;
+        this.studentName = studentName;
+    }
+
+    public Booking(Time time, Date date, int idUser, int idLesson) {
+        this.time = time;
+        this.date = date;
+        this.idUser = idUser;
+        this.idLesson = idLesson;
+    }
+
+    public Booking(Date date, Time time) {
+        this.date = date;
+        this.time = time;
     }
 
     public int getIdBooking() {
@@ -68,6 +84,10 @@ public class Booking {
         this.idLesson = idLesson;
     }
 
+    public String getStudentName() {
+        return studentName;
+    }
+
     @Override
     public String toString() {
         return "Prenotazione{" +
@@ -79,4 +99,6 @@ public class Booking {
                 ", idLesson=" + idLesson +
                 '}';
     }
+
+
 }

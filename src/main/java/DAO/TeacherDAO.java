@@ -1,5 +1,6 @@
 package DAO;
 
+import entities.Booking;
 import entities.Teacher;
 import org.json.JSONObject;
 import utils.UtilsMethods;
@@ -112,4 +113,31 @@ public class TeacherDAO {
             }
         }
     }
+
+    public static ArrayList<Booking> getUnavailableDates(int courseTeacher) throws SQLException {
+        String query = "" +
+                "select * " +
+                "from booking " +
+                "where courseTeacher = (?) and state = 0";
+
+        DbManager db = new DbManager();
+        try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
+            ps.setInt(1, courseTeacher);
+            ResultSet rs = ps.executeQuery();
+
+            if (UtilsMethods.countRows(rs) > 0) {
+                rs.beforeFirst();
+                ArrayList<Booking> response = new ArrayList<>();
+                while (rs.next()) {
+                    Booking datetime = new Booking(
+                            rs.getDate("dateBooked"),
+                            rs.getTime("hourBooked")
+                    );
+                    response.add(datetime);
+                }
+                return response;
+            } else return null;
+        }
+    }
+
 }

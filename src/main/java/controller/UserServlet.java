@@ -114,9 +114,9 @@ public class UserServlet extends HttpServlet {
                 out.flush();
                 break;
         }
-
-
     }
+
+
 
     public void destroy() {
     }

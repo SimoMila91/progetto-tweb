@@ -1,8 +1,10 @@
 package controller;
 
+import DAO.BookingDAO;
 import DAO.TeacherDAO;
 import DAO.UserDAO;
 import com.google.gson.Gson;
+import entities.Booking;
 import entities.Teacher;
 import org.json.JSONObject;
 import utils.JsonUtils;
@@ -124,6 +126,37 @@ public class TeacherServlet extends HttpServlet {
                     } else {
                         res.setStatus(401);
                         out.println("Non hai i permessi per effettuare questa operazione");
+                        out.flush();
+                    }
+                    break;
+                case "getTeacherDates":
+                    if (!SessionHandler.checkIsAdmin(session)) {
+                        ArrayList<Booking> unavailableDates = TeacherDAO.getUnavailableDates(request.getInt("idCourseTeacher"));
+                        JSONObject response = new JSONObject();
+                        if (unavailableDates != null) {
+                            response.put("dates", new Gson().toJson(unavailableDates));
+                            out.println(response);
+                            out.flush();
+                        } else {
+                            response.put("dates", new Gson().toJson((Object) null));
+                            out.println();
+                            out.flush();
+                        }
+                    } else if(SessionHandler.checkIsAdmin(session)) {
+                        ArrayList<Booking> bookedLessons = BookingDAO.getBookedLessons(request.getInt("idCourseTeacher"));
+                        JSONObject response = new JSONObject();
+                        if (bookedLessons != null) {
+                            response.put("dates", new Gson().toJson(bookedLessons));
+                            out.println(response);
+                            out.flush();
+                        } else {
+                            response.put("dates", new Gson().toJson((Object) null));
+                            out.println();
+                            out.flush();
+                        }
+                    } else {
+                        res.setStatus(401);
+                        out.println("Non sei autorizzato");
                         out.flush();
                     }
                     break;
