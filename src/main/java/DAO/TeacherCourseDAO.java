@@ -1,5 +1,6 @@
 package DAO;
 
+import entities.Teacher;
 import entities.TeacherCourse;
 import utils.UtilsMethods;
 
@@ -33,11 +34,12 @@ public class TeacherCourseDAO {
 
     public static ArrayList<TeacherCourse> getTeachings() throws SQLException {
         String query = "" +
-                "select co.*, t.name, c.title " +
+                "select co.*, t.name, t.surname, c.title " +
                 "from  courseteacher co " +
                 "join teacher t on (t.idTeacher =  co.idTeacher)" +
                 "join course c on (c.idCourse = co.idCourse) " +
-                "where t.active = 1 and c.active = 1";
+                "where t.active = 0 and c.active = 0" +
+                "order by t.name";
         DbManager db = new DbManager();
         try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
             ResultSet rs = ps.executeQuery();
@@ -68,7 +70,7 @@ public class TeacherCourseDAO {
                 "from courseteacher co" +
                 "join teacher t on (t.idTeacher = co.idTeacher)" +
                 "join course c on (c.idCourse = co.idCourse)" +
-                "where active = 1 and c.active = 1 and idTeacher = (?)";
+                "where active = 0 and c.active = 0 and idTeacher = (?)";
         DbManager db = new DbManager();
         try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
             ps.setInt(1, idTeacher);
@@ -91,6 +93,31 @@ public class TeacherCourseDAO {
             } else {
                 return null;
             }
+        }
+    }
+
+    public static ArrayList<Teacher> getCourseTeachers(int idCourse) throws SQLException {
+        String query = "" +
+                "select t.*, c.name" +
+                "from teacher t join courseTeacher ct on (t.idTeacher = ct.idTeacher) " +
+                "join course c on (ct.idCourse = c.idCourse)" +
+                "where c.idCourse = (?) and t.active = 0 and c.active = 0";
+
+        DbManager db = new DbManager();
+        try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
+            ps.setInt(1, idCourse);
+            ResultSet rs = ps.executeQuery();
+            ArrayList<Teacher> response = new ArrayList<>();
+            while(rs.next()) {
+                Teacher teacher = new Teacher(
+                        rs.getInt("idTeacher"),
+                        rs.getString("name"),
+                        rs.getString("surname"),
+                        rs.getInt("rating")
+                );
+                response.add(teacher);
+            }
+            return response;
         }
     }
 

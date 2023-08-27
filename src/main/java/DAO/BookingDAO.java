@@ -3,6 +3,8 @@ package DAO;
 import entities.Booking;
 import utils.UtilsMethods;
 
+import javax.servlet.http.HttpSession;
+import java.awt.print.Book;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -57,6 +59,38 @@ public class BookingDAO {
         }
     }
 
+    public static ArrayList<Booking> getMyBookedLessons(int idUser) throws SQLException {
+        String query = "" +
+                "select *" +
+                "from booking " +
+                "where idUser = (?)" +
+                "order by dateBooked desc";
+        DbManager db = new DbManager();
+        try(PreparedStatement ps = db.openConnection().prepareStatement(query)) {
+            ps.setInt(1, idUser);
+            ResultSet rs = ps.executeQuery();
+
+            if (UtilsMethods.countRows(rs) > 0) {
+                rs.beforeFirst();
+                ArrayList<Booking> response = new ArrayList<>();
+                while(rs.next()) {
+                    Booking booked = new Booking(
+                            rs.getInt("idBooking"),
+                            rs.getTime("hourBooked"),
+                            rs.getDate("dateBooked"),
+                            rs.getInt("state"),
+                            rs.getInt("idUser"),
+                            rs.getInt("idCourseTeacher"),
+                            rs.getString("name")
+                    );
+                    response.add(booked);
+                }
+                return response;
+            } else return null;
+
+        }
+    }
+
     public static ArrayList<Booking> getBookedLessons(int idTeacher) throws SQLException {
         String query = "" +
                 "select b.*, u.name" +
@@ -87,6 +121,32 @@ public class BookingDAO {
                 }
                 return response;
             } else return null;
+        }
+    }
+
+    // admin and user
+    public static boolean cancelBooking(int idBooking) throws SQLException {
+        String query = "" +
+                "update booking " +
+                "set state = 2 " +
+                "where idBooking = (?)";
+        DbManager db = new DbManager();
+        try(PreparedStatement ps = db.openConnection().prepareStatement(query)) {
+            ps.setInt(1, idBooking);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+
+    public static boolean bookingDone(int idBooking) throws SQLException {
+        String query = "" +
+                "update booking " +
+                "set state = 1 " +
+                "where idBooking = (?)";
+        DbManager db = new DbManager();
+        try(PreparedStatement ps = db.openConnection().prepareStatement(query)) {
+            ps.setInt(1, idBooking);
+            return ps.executeUpdate() > 0;
         }
     }
 }
