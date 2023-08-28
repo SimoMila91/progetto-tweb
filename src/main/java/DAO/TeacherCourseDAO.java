@@ -99,7 +99,7 @@ public class TeacherCourseDAO {
     public static ArrayList<Teacher> getCourseTeachers(int idCourse) throws SQLException {
         String query = "" +
                 "select t.*, c.name" +
-                "from teacher t join courseTeacher ct on (t.idTeacher = ct.idTeacher) " +
+                "from teacher t join courseteacher ct on (t.idTeacher = ct.idTeacher) " +
                 "join course c on (ct.idCourse = c.idCourse)" +
                 "where c.idCourse = (?) and t.active = 0 and c.active = 0";
 
@@ -122,7 +122,7 @@ public class TeacherCourseDAO {
     }
 
     public static boolean deleteTeaching(int idTeaching) throws SQLException {
-        String query = "delete from courseteacher where idCourseTeacher = (?)";
+        String query = "UPDATED courseteacher SET active = 1  where idCourseTeacher = (?)";
         DbManager db = new DbManager();
         try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
             ps.setInt(1, idTeaching);
