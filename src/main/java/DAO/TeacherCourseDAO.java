@@ -1,5 +1,6 @@
 package DAO;
 
+import DTO.TeacherCourseDTO;
 import entities.Teacher;
 import entities.TeacherCourse;
 import utils.UtilsMethods;
@@ -64,27 +65,25 @@ public class TeacherCourseDAO {
         }
     }
 
-    public static ArrayList<TeacherCourse> getTeacherCourses(int idTeacher) throws SQLException {
+    public static ArrayList<TeacherCourseDTO> getTeacherCourses(int idTeacher) throws SQLException {
         String query = "" +
-                "select co.*, c.course" +
-                "from courseteacher co" +
-                "join teacher t on (t.idTeacher = co.idTeacher)" +
-                "join course c on (c.idCourse = co.idCourse)" +
-                "where active = 0 and c.active = 0 and idTeacher = (?)";
+                "select co.idCourseTeacher, c.title" +
+                " from courseteacher co" +
+                " join teacher t on (t.idTeacher = co.idTeacher)" +
+                " join course c on (c.idCourse = co.idCourse)" +
+                " where c.active = 0 and t.idTeacher = (?) and co.idTeacher = (?)";
         DbManager db = new DbManager();
         try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
             ps.setInt(1, idTeacher);
+            ps.setInt(2, idTeacher);
             ResultSet rs = ps.executeQuery();
             int counter = UtilsMethods.countRows(rs);
             if (counter > 0) {
                 rs.beforeFirst();
-                ArrayList<TeacherCourse> response = new ArrayList<>();
+                ArrayList<TeacherCourseDTO> response = new ArrayList<>();
                 while (rs.next()) {
-                    TeacherCourse tc = new TeacherCourse(
-                            rs.getInt("idTeacherCourse"),
-                            rs.getInt("idTeacher"),
-                            rs.getInt("idCourse"),
-                            rs.getString("name"),
+                    TeacherCourseDTO tc = new TeacherCourseDTO(
+                            rs.getInt("idCourseTeacher"),
                             rs.getString("title")
                     );
                     response.add(tc);
@@ -97,15 +96,26 @@ public class TeacherCourseDAO {
     }
 
     public static ArrayList<Teacher> getCourseTeachers(int idCourse) throws SQLException {
-        String query = "" +
-                "select t.*, c.name" +
-                "from teacher t join courseteacher ct on (t.idTeacher = ct.idTeacher) " +
-                "join course c on (ct.idCourse = c.idCourse)" +
-                "where c.idCourse = (?) and t.active = 0 and c.active = 0";
+        String query;
+        if (idCourse == 0) {
+            query = "" +
+                    "select t.*, c.title" +
+                    " from teacher t join courseteacher ct on (t.idTeacher = ct.idTeacher) " +
+                    " join course c on (c.idCourse = ct.idCourse)" +
+                    " where t.active = 1 and c.active = 0 and ct.active = 0";
+        } else {
+            query = "" +
+                    "select t.*, c.title" +
+                    " from teacher t join courseteacher ct on (t.idTeacher = ct.idTeacher) " +
+                    " join course c on (c.idCourse = ct.idCourse)" +
+                    " where c.idCourse = (?) and t.active = 1 and c.active = 0 and ct.active = 0";
+        }
 
         DbManager db = new DbManager();
         try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
-            ps.setInt(1, idCourse);
+            if (idCourse > 0 ) {
+                ps.setInt(1, idCourse);
+            }
             ResultSet rs = ps.executeQuery();
             ArrayList<Teacher> response = new ArrayList<>();
             while(rs.next()) {
@@ -113,7 +123,8 @@ public class TeacherCourseDAO {
                         rs.getInt("idTeacher"),
                         rs.getString("name"),
                         rs.getString("surname"),
-                        rs.getInt("rating")
+                        rs.getInt("rating"),
+                        rs.getString("image")
                 );
                 response.add(teacher);
             }

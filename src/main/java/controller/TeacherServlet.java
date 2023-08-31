@@ -27,9 +27,14 @@ public class TeacherServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
             response.setContentType("application/json");
             int idTeacher = 0;
+            String action = "";
+            if (request.getParameter("action") != null) {
+                action = request.getParameter("action");
+            }
             if (request.getParameter("idTeacher") != null) {
                 idTeacher = Integer.parseInt(request.getParameter("idTeacher"));
             }
+
             try {
                 if (idTeacher > 0) {
                     Teacher getTeacher = TeacherDAO.getTeacher(idTeacher);
@@ -42,15 +47,13 @@ public class TeacherServlet extends HttpServlet {
                         out.flush();
                     }
                 } else {
-                    ArrayList<Teacher> getTeachers =  TeacherDAO.getTeachers();
-                    if (getTeachers != null) {
-                        String json = new Gson().toJson(getTeachers);
-                        out.println(json);
-                        out.flush();
-                    } else {
-                        out.println("Non ci sono insegnanti");
-                        out.flush();
-                    }
+                    ArrayList<Teacher> getTeachers =  TeacherDAO.getTeachers(action);
+
+                    JSONObject res = new JSONObject();
+                    res.put("teachers", getTeachers);
+                    String json = new Gson().toJson(getTeachers);
+                    out.println(json);
+                    out.flush();
                 }
 
             } catch (SQLException ex) {

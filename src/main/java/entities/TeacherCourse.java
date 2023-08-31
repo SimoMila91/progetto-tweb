@@ -2,10 +2,17 @@ package entities;
 
 public class TeacherCourse {
     private int idTeacherCourse;
+    private String titleCourse ;
     private int idTeacher;
     private int idCourse;
     private String teacherName;
-    private String titleCourse ;
+
+
+
+    public TeacherCourse(int idTeacherCourse, String titleCourse) {
+        this.idTeacherCourse = idTeacherCourse;
+        this.titleCourse = titleCourse;
+    }
 
     public TeacherCourse(int idTeacherCourse, int idTeacher, int idCourse, String teacherName, String titleCourse) {
         this.idTeacherCourse = idTeacherCourse;
@@ -55,14 +62,5 @@ public class TeacherCourse {
         this.titleCourse = titleCourse;
     }
 
-    @Override
-    public String toString() {
-        return "TeacherCourse{" +
-                "idTeacherCourse=" + idTeacherCourse +
-                ", idTeacher=" + idTeacher +
-                ", idCourse=" + idCourse +
-                ", teacherName='" + teacherName + '\'' +
-                ", titleCourse='" + titleCourse + '\'' +
-                '}';
-    }
+
 }

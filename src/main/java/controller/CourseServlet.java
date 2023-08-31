@@ -65,6 +65,18 @@ public class CourseServlet extends HttpServlet {
             processRequest(request, response);
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
+            JSONObject res = new JSONObject();
+            PrintWriter out = response.getWriter();
+            if (ex.getErrorCode() == 1062) {
+                response.setStatus(409);
+                res.put("message", "Non puoi creare un corso due volte. Si prega di crearne uno nuovo.");
+            } else {
+                response.setStatus(500);
+                res.put("message", "Errore interno al server. Si prega di contattare il supporto.");
+            }
+            out.println(res);
+            out.flush();
+            out.close();
         }
     }
 
@@ -81,7 +93,9 @@ public class CourseServlet extends HttpServlet {
                     if (SessionHandler.checkIsAdmin(session)) {
                         int createCourse = CourseDAO.createCourse(request);
                         if (createCourse > 0) {
-                            out.println(new Gson().toJson(createCourse));
+                            JSONObject response = new JSONObject();
+                            response.put("idCourse", createCourse);
+                            out.println(response);
                             out.flush();
                         } else {
                             res.setStatus(500);

@@ -5,13 +5,14 @@ import java.util.List;
 public class Teacher extends Person {
     private int idTeacher;
     private int rating;
-    private List<String> subjects;
     private int active;
+    private String image;
 
-    public Teacher(int idTeacher, String name, String surname, int rating) {
+    public Teacher(int idTeacher, String name, String surname, int rating, String image) {
         super(name, surname);
         this.idTeacher = idTeacher;
         this.rating = rating;
+        this.image = image;
     }
 
     public Teacher(int idTeacher, String name, String surname, int rating, int active) {
@@ -19,21 +20,21 @@ public class Teacher extends Person {
         this.idTeacher = idTeacher;
         this.rating = rating;
         this.active = active;
+        this.image = image;
     }
 
-    public Teacher(String name, String surname, int idTeacher, int rating, List<String> subjects) {
+    public Teacher(String name, String surname, int idTeacher, int rating) {
         super(name, surname);
         this.idTeacher = idTeacher;
         this.rating = rating;
-        this.subjects = subjects;
     }
 
-    public List<String> getSubjects() {
-        return subjects;
+    public String getImage() {
+        return image;
     }
 
-    public void setSubjects(List<String> subjects) {
-        this.subjects = subjects;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public int getIdTeacher() {

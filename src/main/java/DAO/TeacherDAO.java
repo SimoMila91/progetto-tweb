@@ -13,10 +13,11 @@ import java.util.ArrayList;
 
 public class TeacherDAO {
 
-    public static ArrayList<Teacher> getTeachers() throws SQLException {
+    public static ArrayList<Teacher> getTeachers(String action) throws SQLException {
         try {
             ArrayList<Teacher> res = new ArrayList<>();
-            String query = "SELECT * FROM teacher";
+            String query = action.equals("active") ?
+                    "SELECT * FROM teacher WHERE active = 1" : "select * from teacher";
             DbManager db = new DbManager();
             try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
                 ResultSet rs = ps.executeQuery();

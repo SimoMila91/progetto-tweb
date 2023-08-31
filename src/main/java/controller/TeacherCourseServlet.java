@@ -2,6 +2,7 @@ package controller;
 
 import DAO.TeacherCourseDAO;
 import DAO.TeacherDAO;
+import DTO.TeacherCourseDTO;
 import com.google.gson.Gson;
 import entities.Teacher;
 import entities.TeacherCourse;
@@ -39,8 +40,10 @@ public class TeacherCourseServlet extends HttpServlet {
                     if (request.getParameter("idTeacher") != null) {
                         idTeacher = Integer.parseInt(request.getParameter("idTeacher"));
                         try {
-                            ArrayList<TeacherCourse> getTeacherCourses = TeacherCourseDAO.getTeacherCourses(idTeacher);
-                            res.put("courses", new Gson().toJson(getTeacherCourses));
+                            ArrayList<TeacherCourseDTO> getTeacherCourses = TeacherCourseDAO.getTeacherCourses(idTeacher);
+                            System.out.println(getTeacherCourses);
+                            res.put("courses", getTeacherCourses);
+                            System.out.println(res);
                         } catch (SQLException e) {
                            System.out.println(e.getMessage());
                            response.setStatus(500);
@@ -57,7 +60,7 @@ public class TeacherCourseServlet extends HttpServlet {
                         idCourse = Integer.parseInt(request.getParameter("idCourse"));
                         try {
                             ArrayList<Teacher> getCourseTeachers = TeacherCourseDAO.getCourseTeachers(idCourse);
-                            res.put("teachers", new Gson().toJson(getCourseTeachers));
+                            res.put("teachers",getCourseTeachers);
                         } catch (SQLException e) {
                             System.out.println(e.getMessage());
                             response.setStatus(500);
