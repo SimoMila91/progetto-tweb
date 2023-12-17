@@ -79,23 +79,31 @@ public class UserServlet extends HttpServlet {
                             email,
                             psw
                     );
-                    User insert = UserDAO.signUp(user);
-                    if (insert != null) {
-                        HttpSession session = req.getSession();
-                        session.setAttribute("idUser", insert.getIdUser());
-                        session.setAttribute("role", insert.getRole());
-                        res.setStatus(200);
-                        response.put("idUser", insert.getIdUser());
-                        response.put("name", insert.getName());
-                        response.put("role", insert.getRole());
-                        response.put("token", session.getId());
-                        response.put("message", "Registrazione avvenuta con successo");
-                        out.println(response);
-                        out.flush();
-                    } else {
-                        res.setStatus(500);
-                        out.println("Errore interno al server, ritenta la registrazione più tardi o contatta il supporto");
-                        out.flush();
+                    try {
+                        User insert = UserDAO.signUp(user);
+                        if (insert != null) {
+                            HttpSession session = req.getSession();
+                            session.setAttribute("idUser", insert.getIdUser());
+                            session.setAttribute("role", insert.getRole());
+                            res.setStatus(200);
+                            response.put("idUser", insert.getIdUser());
+                            response.put("name", insert.getName());
+                            response.put("role", insert.getRole());
+                            response.put("token", session.getId());
+                            response.put("message", "Registrazione avvenuta con successo");
+                            out.println(response);
+                            out.flush();
+                        } else {
+                            res.setStatus(500);
+                            out.println("Errore interno al server, ritenta la registrazione più tardi o contatta il supporto");
+                            out.flush();
+                        }
+                    } catch (SQLException ex) {
+                        if (ex.getErrorCode() == 1062) {
+                            res.setStatus(409);
+                            out.println("L'email inserita risulta registrata. Effettua il login o registra un nuovo account.");
+                            out.flush();
+                        }
                     }
 
                 } else {
@@ -105,7 +113,9 @@ public class UserServlet extends HttpServlet {
                 }
                 break;
             case "logout":
+                System.out.println("sono qua");
                 HttpSession session = req.getSession(false);
+                System.out.println("qua");
                 session.invalidate();
                 break;
             default:

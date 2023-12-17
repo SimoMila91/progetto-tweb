@@ -12,12 +12,8 @@ public class Course {
     }
 
     public Course(int idCourse, String title) {
+        this.idCourse = idCourse;
         this.title = title;
-    }
-
-    public Course(String title, int active) {
-        this.title = title;
-        this.active = active;
     }
 
     public int getIdCourse() {

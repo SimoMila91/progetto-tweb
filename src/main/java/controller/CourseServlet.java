@@ -20,9 +20,10 @@ import java.util.ArrayList;
 public class CourseServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (SessionHandler.checkSession(request)) {
-            PrintWriter out = response.getWriter();
-            response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        response.setContentType("application/json");
+        System.out.println(SessionHandler.checkSession(request));
+        if (SessionHandler.checkSession(request))  {
             int idCourse = 0;
             if (request.getParameter("idCourse") != null) {
                 idCourse = Integer.parseInt(request.getParameter("idCourse"));
@@ -54,8 +55,20 @@ public class CourseServlet extends HttpServlet {
                 System.out.println(ex.getMessage());
             }
         } else {
-            response.setStatus(401);
-            response.getWriter().println("Sessione scaduta");
+            ArrayList<Course> getCourses = null;
+            try {
+                getCourses = CourseDAO.getCourses(0);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            if (getCourses != null) {
+                String json = new Gson().toJson(getCourses);
+                out.println(json);
+                out.flush();
+            } else {
+                out.println("Non ci sono corsi");
+                out.flush();
+            }
         }
     }
 

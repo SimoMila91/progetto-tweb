@@ -5,31 +5,53 @@ import entities.Teacher;
 import entities.TeacherCourse;
 import utils.UtilsMethods;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class TeacherCourseDAO {
 
     public static int createTeaching(int idTeacher, int idCourse) throws SQLException {
-        String query = "INSERT INTO courseteacher (idCourse, idTeacher) VALUES (?, ?)";
+        String queryCheck = "SELECT idCourseTeacher FROM courseteacher WHERE idCourse = ? AND idTeacher = ? AND active = 1";
+        String queryUpdate = "UPDATE courseteacher SET active = 0 WHERE idCourse = ? AND idTeacher = ?";
+        String queryInsert = "INSERT INTO courseteacher (idCourse, idTeacher) VALUES (?, ?)";
+
         DbManager db = new DbManager();
-        try (PreparedStatement ps = db.openConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, idCourse);
-            ps.setInt(2, idTeacher);
-            int rows = ps.executeUpdate();
-            if (rows > 0) {
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return (int) rs.getLong(1);
+
+        try (Connection conn = db.openConnection();
+             PreparedStatement psCheck = conn.prepareStatement(queryCheck);
+             PreparedStatement psUpdate = conn.prepareStatement(queryUpdate);
+             PreparedStatement psInsert = conn.prepareStatement(queryInsert, Statement.RETURN_GENERATED_KEYS)) {
+
+            psCheck.setInt(1, idCourse);
+            psCheck.setInt(2, idTeacher);
+            ResultSet rsCheck = psCheck.executeQuery();
+
+            if (rsCheck.next()) {
+                psUpdate.setInt(1, idCourse);
+                psUpdate.setInt(2, idTeacher);
+                int rowsUpdated = psUpdate.executeUpdate();
+                if (rowsUpdated > 0) {
+                    return rsCheck.getInt("idCourseTeacher");
                 } else {
-                    return 0;
+                    return -1;
                 }
             } else {
-                return -1;
+                psInsert.setInt(1, idCourse);
+                psInsert.setInt(2, idTeacher);
+                int rowsInserted = psInsert.executeUpdate();
+                if (rowsInserted > 0) {
+                    ResultSet rsInsert = psInsert.getGeneratedKeys();
+                    if (rsInsert.next()) {
+                        return rsInsert.getInt(1);
+                    } else {
+                        return 0;
+                    }
+                } else {
+                    return -1;
+                }
             }
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -62,6 +84,8 @@ public class TeacherCourseDAO {
             } else {
                 return null;
             }
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -71,7 +95,7 @@ public class TeacherCourseDAO {
                 " from courseteacher co" +
                 " join teacher t on (t.idTeacher = co.idTeacher)" +
                 " join course c on (c.idCourse = co.idCourse)" +
-                " where c.active = 0 and t.idTeacher = (?) and co.idTeacher = (?)";
+                " where c.active = 0 and co.active = 0 and t.idTeacher = (?) and co.idTeacher = (?)";
         DbManager db = new DbManager();
         try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
             ps.setInt(1, idTeacher);
@@ -92,6 +116,8 @@ public class TeacherCourseDAO {
             } else {
                 return null;
             }
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -99,10 +125,11 @@ public class TeacherCourseDAO {
         String query;
         if (idCourse == 0) {
             query = "" +
-                    "select t.*, c.title" +
+                    "select distinct t.*, c.title" +
                     " from teacher t join courseteacher ct on (t.idTeacher = ct.idTeacher) " +
                     " join course c on (c.idCourse = ct.idCourse)" +
-                    " where t.active = 1 and c.active = 0 and ct.active = 0";
+                    " where t.active = 1 and c.active = 0 and ct.active = 0" +
+                    " group by t.idTeacher";
         } else {
             query = "" +
                     "select t.*, c.title" +
@@ -129,16 +156,20 @@ public class TeacherCourseDAO {
                 response.add(teacher);
             }
             return response;
+        } finally {
+            db.closeConnection();
         }
     }
 
     public static boolean deleteTeaching(int idTeaching) throws SQLException {
-        String query = "UPDATED courseteacher SET active = 1  where idCourseTeacher = (?)";
+        String query = "UPDATE courseteacher SET active = 1  where idCourseTeacher = (?)";
         DbManager db = new DbManager();
         try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
             ps.setInt(1, idTeaching);
             int row = ps.executeUpdate();
             return row > 0;
+        } finally {
+            db.closeConnection();
         }
     }
 }

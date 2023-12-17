@@ -38,6 +38,8 @@ public class CourseDAO {
                         response.add(course);
                     }
                 }
+
+                System.out.println(response.toString());
                 return response;
             } else {
                 return null;
@@ -88,7 +90,7 @@ public class CourseDAO {
     }
 
     public static boolean delete(int id) throws SQLException {
-        String query = "UPDATE course SET active = 0 WHERE idCourse = (?) AND active = 1";
+        String query = "UPDATE course SET active = 1 WHERE idCourse = (?)";
         DbManager db = new DbManager();
         try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
             ps.setInt(1, id);
@@ -98,7 +100,7 @@ public class CourseDAO {
     }
 
     public static boolean activeCourse(int id) throws SQLException {
-        String query = "UPDATE course SET active = 1 WHERE idCourse = (?) AND active = 0";
+        String query = "UPDATE course SET active = 0 WHERE idCourse = (?) AND active = 1";
         DbManager db = new DbManager();
         try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
             ps.setInt(1, id);

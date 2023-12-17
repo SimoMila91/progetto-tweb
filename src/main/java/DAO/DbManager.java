@@ -2,7 +2,7 @@ package DAO;
 
 import java.sql.*;
 
-public class DbManager {
+public class DbManager implements AutoCloseable {
 
     private static final String URL = "jdbc:mysql://localhost:3306/ripetizioni_db";
     private static final String USERNAME = "root";
@@ -31,5 +31,14 @@ public class DbManager {
 
     public void closeConnection() throws SQLException {
         conn.close();
+        System.out.println("Connection closed from closeConnection()");
+    }
+
+    @Override
+    public void close() throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+            System.out.println("Connection AutoClosed");
+        }
     }
 }

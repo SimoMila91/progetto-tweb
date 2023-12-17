@@ -133,30 +133,23 @@ public class TeacherServlet extends HttpServlet {
                     }
                     break;
                 case "getTeacherDates":
-                    if (!SessionHandler.checkIsAdmin(session)) {
-                        ArrayList<Booking> unavailableDates = TeacherDAO.getUnavailableDates(request.getInt("idCourseTeacher"));
+                    if (!SessionHandler.checkIsAdmin(session) && request.has("idTeacher")) {
+                        ArrayList<Booking> unavailableDates = TeacherDAO.getUnavailableDates(request.getInt("idTeacher"));
                         JSONObject response = new JSONObject();
                         if (unavailableDates != null) {
-                            response.put("dates", new Gson().toJson(unavailableDates));
-                            out.println(response);
-                            out.flush();
+                            response.put("dates", unavailableDates);
                         } else {
-                            response.put("dates", new Gson().toJson((Object) null));
-                            out.println();
-                            out.flush();
+                            response.put("dates", (Object) null);
                         }
-                    } else if(SessionHandler.checkIsAdmin(session)) {
-                        ArrayList<Booking> bookedLessons = BookingDAO.getBookedLessons(request.getInt("idCourseTeacher"));
+                        System.out.println(response.toString());
+                        out.println(response);
+                        out.flush();
+                    } else if(SessionHandler.checkIsAdmin(session) && request.has("idTeacher")) {
+                        ArrayList<Booking> bookedLessons = BookingDAO.getBookedLessons(request.getInt("idTeacher"));
                         JSONObject response = new JSONObject();
-                        if (bookedLessons != null) {
-                            response.put("dates", new Gson().toJson(bookedLessons));
-                            out.println(response);
-                            out.flush();
-                        } else {
-                            response.put("dates", new Gson().toJson((Object) null));
-                            out.println();
-                            out.flush();
-                        }
+                        response.put("dates", bookedLessons);
+                        out.println(response);
+                        out.flush();
                     } else {
                         res.setStatus(401);
                         out.println("Non sei autorizzato");

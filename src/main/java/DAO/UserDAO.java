@@ -10,32 +10,30 @@ public class UserDAO {
     /* Register user  */
     public static User signUp(User user) throws SQLException {
         String cryptPsw = BCrypt.hashpw(user.getPsw(), BCrypt.gensalt());
-        try {
-            String query = "INSERT INTO users (name, surname, psw, email) VALUES (?,?,?,?)";
-            DbManager db = new DbManager();
-            try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
-                ps.setString(1, user.getName());
-                ps.setString(2, user.getSurname());
-                ps.setString(3, cryptPsw);
-                ps.setString(4, user.getEmail());
+        String query = "INSERT INTO users (name, surname, psw, email) VALUES (?,?,?,?)";
+        try (DbManager db = new DbManager();
+             PreparedStatement ps = db.openConnection().prepareStatement(query)) {
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getSurname());
+            ps.setString(3, cryptPsw);
+            ps.setString(4, user.getEmail());
 
-                int rs =  ps.executeUpdate();
-                if (rs > 0) {
-                   return login(user.getEmail(), user.getPsw());
-                } else return null;
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-            return null;
+            int rs = ps.executeUpdate();
+            if (rs > 0) {
+                return login(user.getEmail(), user.getPsw());
+            } else return null;
         }
     }
+
+
 
     /* Login user */
     public static User login(String email, String psw) throws SQLException {
         try {
             String query = "SELECT * FROM users WHERE email = (?)";
-            DbManager db = new DbManager();
-            try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
+
+            try (DbManager db = new DbManager();
+                 PreparedStatement ps = db.openConnection().prepareStatement("SELECT * FROM users WHERE email = (?)")) {
                 ps.setString(1, email);
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {

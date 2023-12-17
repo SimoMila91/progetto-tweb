@@ -1,6 +1,7 @@
 package controller;
 
 import DAO.BookingDAO;
+import DTO.BookingDTO;
 import com.google.gson.Gson;
 import entities.Booking;
 import org.json.JSONObject;
@@ -18,34 +19,51 @@ import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
 
 @WebServlet(name = "BookingServlet", value = "/BookingServlet")
 public class BookingServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // checking if session is valid and idTeacher parameter exist
+        PrintWriter out = response.getWriter();
         if (SessionHandler.checkSession(request)) {
-            int idUser = Integer.parseInt((String) request.getSession(false).getAttribute("idUser"));
-            PrintWriter out = response.getWriter();
+            HttpSession session = request.getSession(false);
+
+            int idUser = 0; // Valore di default se l'attributo non è presente o non è un intero valido
+
+            idUser = (int) session.getAttribute("idUser");
             System.out.println(idUser); // debug
             if (idUser > 0) {
+                JSONObject res = new JSONObject();
                 try {
-                    ArrayList<Booking> myBooking = BookingDAO.getMyBookedLessons(idUser);
-                    JSONObject res = new JSONObject();
-                    res.put("message",
-                            myBooking != null ?
-                                    "Ci sono " + myBooking.size() + " prenotazioni"
-                                    :
-                                    "Non ci sono prenotazioni"
-                            );
-                    res.put("booking", new Gson().toJson(myBooking));
+                    if (SessionHandler.checkIsAdmin(session)) {
+                        System.out.println("admin");
+                        ArrayList<BookingDTO> teacherBooking = BookingDAO.getBookedLessons();
+
+                        res.put("message",
+                                teacherBooking != null ?
+                                        "Ci sono " + teacherBooking.size() + " prenotazioni"
+                                        :
+                                        "Non ci sono prenotazioni"
+                        );
+                        res.put("booking", teacherBooking);
+                    } else {
+                        ArrayList<BookingDTO> myBooking = BookingDAO.getMyBookedLessons(idUser);
+                        res.put("message",
+                                myBooking != null ?
+                                        "Ci sono " + myBooking.size() + " prenotazioni"
+                                        :
+                                        "Non ci sono prenotazioni"
+                        );
+                        res.put("booking", myBooking);
+                    }
+
                     out.println(res);
                     out.flush();
                 } catch (SQLException ex) {
                     System.out.println(ex.getMessage());
                     response.setStatus(500);
-                    JSONObject res = new JSONObject();
                     res.put("message", "Errore interno nel sistema. Ritenta più tardi o contatta il supporto.");
                     out.println(res);
                     out.flush();
@@ -57,6 +75,11 @@ public class BookingServlet extends HttpServlet {
                 out.println(res);
                 out.flush();
             }
+
+        } else {
+            response.setStatus(401);
+            out.println("sessione scaduta");
+            out.flush();
         }
 
     }
@@ -80,8 +103,11 @@ public class BookingServlet extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException, ParseException {
         JSONObject req = JsonUtils.readJson(request);
         PrintWriter out = response.getWriter();
-        HttpSession session = request.getSession();
-        int idBooking = req.getInt("idBooking");
+        HttpSession session = request.getSession(false);
+        int idBooking = 0;
+        if (req.has("idBooking")) {
+            idBooking = req.getInt("idBooking");
+        }
         JSONObject res = new JSONObject();
 
         if (req.has("action")) {
@@ -94,17 +120,17 @@ public class BookingServlet extends HttpServlet {
                         // get time and date
                         String timeString = req.getString("time");
                         String dateString = req.getString("date");
-                        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+                        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        Date utilDate = new Date(dateFormat.parse(dateString).getTime());
                         Time time = new Time(timeFormat.parse(timeString).getTime());
-                        Date date = dateFormat.parse(dateString);
                         // get other params
-                        int idUser = Integer.parseInt((String)session.getAttribute("idUser"));
+                        int idUser = (int) session.getAttribute("idUser");
                         int idCourseTeacher = req.getInt("idCourseTeacher");
                         // create booking
                         Booking booking = new Booking(
                                 time,
-                                (java.sql.Date) date,
+                                utilDate,
                                 idUser,
                                 idCourseTeacher
                         );
@@ -115,7 +141,7 @@ public class BookingServlet extends HttpServlet {
                             out.println(res);
                             out.flush();
                         } else {
-                            throw new RuntimeException("Errore nel sistema. Contattare il supporto");
+                            System.out.println("errore");
                         }
                     }
                     break;
@@ -131,7 +157,9 @@ public class BookingServlet extends HttpServlet {
                     out.flush();
                     break;
                 case "done":
-                    if (session.getAttribute("idRole").equals(0)) {
+                    System.out.println("qua");
+                    if ((int)session.getAttribute("role") == 0) {
+                        System.out.println("anche");
                         boolean bookingDone = BookingDAO.bookingDone(idBooking);
                         if (bookingDone) {
                             res.put("message", "La prenotazione è stata aggiornata con successo.");

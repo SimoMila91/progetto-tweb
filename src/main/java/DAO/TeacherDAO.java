@@ -115,15 +115,15 @@ public class TeacherDAO {
         }
     }
 
-    public static ArrayList<Booking> getUnavailableDates(int courseTeacher) throws SQLException {
+    public static ArrayList<Booking> getUnavailableDates(int idTeacher) throws SQLException {
         String query = "" +
                 "select * " +
-                "from booking " +
-                "where courseTeacher = (?) and state = 0";
+                "from bookings b join courseteacher c on (b.idCourseTeacher = c.idCourseTeacher) " +
+                "where c.idTeacher = (?) and state = 0";
 
         DbManager db = new DbManager();
         try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
-            ps.setInt(1, courseTeacher);
+            ps.setInt(1, idTeacher);
             ResultSet rs = ps.executeQuery();
 
             if (UtilsMethods.countRows(rs) > 0) {
