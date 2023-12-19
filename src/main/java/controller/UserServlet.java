@@ -113,10 +113,9 @@ public class UserServlet extends HttpServlet {
                 }
                 break;
             case "logout":
-                System.out.println("sono qua");
+                System.out.println("logout");
                 HttpSession session = req.getSession(false);
-                System.out.println("qua");
-                session.invalidate();
+                if (session != null) session.invalidate();
                 break;
             default:
                 res.setStatus(404);
@@ -124,6 +123,7 @@ public class UserServlet extends HttpServlet {
                 out.flush();
                 break;
         }
+        out.close();
     }
 
 

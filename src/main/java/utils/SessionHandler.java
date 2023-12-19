@@ -7,6 +7,7 @@ public class SessionHandler {
 
     public static boolean checkSession(HttpServletRequest req) {
         HttpSession session = req.getSession(false);
+        System.out.println(session);
         return session != null;
     }
 

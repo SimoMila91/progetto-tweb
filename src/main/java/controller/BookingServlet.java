@@ -77,10 +77,13 @@ public class BookingServlet extends HttpServlet {
             }
 
         } else {
+            JSONObject res = new JSONObject();
             response.setStatus(401);
-            out.println("sessione scaduta");
+            res.put("message", "Sessione scaduta");
+            out.println(res);
             out.flush();
         }
+        out.close();
 
     }
 
@@ -186,6 +189,7 @@ public class BookingServlet extends HttpServlet {
             out.println("Errore nella richiesta");
             out.flush();
         }
+        out.close();
     }
 
     @Override

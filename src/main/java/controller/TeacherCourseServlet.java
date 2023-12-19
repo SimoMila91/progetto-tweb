@@ -91,7 +91,9 @@ public class TeacherCourseServlet extends HttpServlet {
                 processRequest(request, response);
             } else {
                 response.setStatus(401);
-                response.getWriter().println("Non sei autorizzato");
+                JSONObject res = new JSONObject();
+                res.put("message", "Sessione scaduta");
+                response.getWriter().println(res);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -132,6 +134,7 @@ public class TeacherCourseServlet extends HttpServlet {
         }
         out.println(res);
         out.flush();
+        out.close();
     }
 
     @Override

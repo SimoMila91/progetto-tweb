@@ -44,6 +44,8 @@ public class BookingDAO {
                     return (int)rs.getLong(1);
                 } else return rows;
             } else return 0;
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -61,6 +63,8 @@ public class BookingDAO {
 
             ResultSet rs = ps.executeQuery();
             return UtilsMethods.countRows(rs) > 0;
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -94,6 +98,8 @@ public class BookingDAO {
                 return response;
             } else return null;
 
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -130,6 +136,8 @@ public class BookingDAO {
                 }
                 return response;
             } else return null;
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -140,7 +148,7 @@ public class BookingDAO {
                 " join bookings b on (b.idCourseTeacher = ct.idCourseTeacher)" +
                 " join course c on (c.idCourse = ct.idCourse)" +
                 " join users u on (b.idUser = u.idUser)" +
-                " order by dateBooked DESC";
+                " order by  CASE WHEN b.state = 0 THEN 0 ELSE 1 END, dateBooked DESC ";
         DbManager db = new DbManager();
         try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
             ResultSet rs = ps.executeQuery();
@@ -165,6 +173,8 @@ public class BookingDAO {
                 }
                 return response;
             } else return null;
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -178,6 +188,8 @@ public class BookingDAO {
         try(PreparedStatement ps = db.openConnection().prepareStatement(query)) {
             ps.setInt(1, idBooking);
             return ps.executeUpdate() > 0;
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -191,6 +203,8 @@ public class BookingDAO {
         try(PreparedStatement ps = db.openConnection().prepareStatement(query)) {
             ps.setInt(1, idBooking);
             return ps.executeUpdate() > 0;
+        } finally {
+            db.closeConnection();
         }
     }
 }

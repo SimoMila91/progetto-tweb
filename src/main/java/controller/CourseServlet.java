@@ -70,6 +70,7 @@ public class CourseServlet extends HttpServlet {
                 out.flush();
             }
         }
+        out.close();
     }
 
     @Override
@@ -180,9 +181,12 @@ public class CourseServlet extends HttpServlet {
         } else {
             //sessione scaduta
             res.setStatus(401);
-            out.println("Sessione scaduta");
+            JSONObject response = new JSONObject();
+            response.put("message", "Sessione scaduta");
+            out.println(response);
             out.flush();
         }
+        out.close();
     }
 
     public void destroy() {}

@@ -61,7 +61,9 @@ public class TeacherServlet extends HttpServlet {
             }
         } else {
             response.setStatus(401);
-            response.getWriter().println("Sessione scaduta");
+            JSONObject res = new JSONObject();
+            res.put("message", "Sessione scaduta");
+            response.getWriter().println(res);
         }
     }
 
@@ -133,8 +135,8 @@ public class TeacherServlet extends HttpServlet {
                     }
                     break;
                 case "getTeacherDates":
-                    if (!SessionHandler.checkIsAdmin(session) && request.has("idTeacher")) {
-                        ArrayList<Booking> unavailableDates = TeacherDAO.getUnavailableDates(request.getInt("idTeacher"));
+                    if (!SessionHandler.checkIsAdmin(session)) {
+                        ArrayList<Booking> unavailableDates = TeacherDAO.getUnavailableDates(request.getInt("idTeacher"), (Integer) session.getAttribute("idUser"));
                         JSONObject response = new JSONObject();
                         if (unavailableDates != null) {
                             response.put("dates", unavailableDates);
@@ -164,9 +166,12 @@ public class TeacherServlet extends HttpServlet {
         } else {
             //sessione scaduta
             res.setStatus(401);
-            out.println("Sessione scaduta");
+            JSONObject response = new JSONObject();
+            response.put("message", "Sessione scaduta");
+            out.println(response);
             out.flush();
         }
+        out.close();
     }
 
     public void destroy() {}

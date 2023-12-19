@@ -14,11 +14,12 @@ import java.util.ArrayList;
 public class TeacherDAO {
 
     public static ArrayList<Teacher> getTeachers(String action) throws SQLException {
+        DbManager db = new DbManager();
         try {
             ArrayList<Teacher> res = new ArrayList<>();
             String query = action.equals("active") ?
                     "SELECT * FROM teacher WHERE active = 1" : "select * from teacher";
-            DbManager db = new DbManager();
+
             try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
                 ResultSet rs = ps.executeQuery();
                 int counter = UtilsMethods.countRows(rs);
@@ -42,13 +43,15 @@ public class TeacherDAO {
         }  catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return null;
+        } finally {
+            db.closeConnection();
         }
     }
 
     public static Teacher getTeacher(int id) throws SQLException {
+        DbManager db = new DbManager();
         try {
             String query = "SELECT * FROM teacher WHERE idTeacher = (?)";
-            DbManager db = new DbManager();
             try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
                 ps.setInt(1, id);
                 ResultSet rs = ps.executeQuery();
@@ -68,6 +71,8 @@ public class TeacherDAO {
         }  catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return null;
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -78,6 +83,8 @@ public class TeacherDAO {
             ps.setInt(1, id);
             int rows = ps.executeUpdate();
             return rows > 0;
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -89,6 +96,8 @@ public class TeacherDAO {
             ps.setInt(1, id);
             int rows = ps.executeUpdate();
             return rows > 0;
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -112,18 +121,21 @@ public class TeacherDAO {
             } else {
                 return 0;
             }
+        } finally {
+            db.closeConnection();
         }
     }
 
-    public static ArrayList<Booking> getUnavailableDates(int idTeacher) throws SQLException {
+    public static ArrayList<Booking> getUnavailableDates(int idTeacher, int idUser) throws SQLException {
         String query = "" +
-                "select * " +
+                "select DISTINCT * " +
                 "from bookings b join courseteacher c on (b.idCourseTeacher = c.idCourseTeacher) " +
-                "where c.idTeacher = (?) and state = 0";
+                "where (c.idTeacher = (?) or b.idUser = (?)) and state = 0";
 
         DbManager db = new DbManager();
         try (PreparedStatement ps = db.openConnection().prepareStatement(query)) {
             ps.setInt(1, idTeacher);
+            ps.setInt(2, idUser);
             ResultSet rs = ps.executeQuery();
 
             if (UtilsMethods.countRows(rs) > 0) {
@@ -138,6 +150,8 @@ public class TeacherDAO {
                 }
                 return response;
             } else return null;
+        } finally {
+            db.closeConnection();
         }
     }
 

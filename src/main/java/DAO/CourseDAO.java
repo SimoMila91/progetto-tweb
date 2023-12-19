@@ -44,6 +44,8 @@ public class CourseDAO {
             } else {
                 return null;
             }
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -64,6 +66,8 @@ public class CourseDAO {
             } else {
                 return null;
             }
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -86,6 +90,8 @@ public class CourseDAO {
             } else {
                 return -1;
             }
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -106,6 +112,8 @@ public class CourseDAO {
             ps.setInt(1, id);
             int rows = ps.executeUpdate();
             return rows > 0;
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -117,6 +125,8 @@ public class CourseDAO {
             ps.setInt(2, idCourse);
             int rows = ps.executeUpdate();
             return rows > 0;
+        } finally {
+            db.closeConnection();
         }
     }
 }
